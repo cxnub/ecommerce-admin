@@ -1,0 +1,20 @@
+.productCard {
+    transition: 0.4s;
+    justify-self: center;
+  &:hover {
+    box-shadow: 0 4px 30px var(--mantine-color-black);
+    transform: translate(0, -5px);
+
+    .productCardButtonGroup {
+      display: flex;
+    }
+  }
+}
+
+.statusBadge {
+  box-shadow: 0 2px 10px var(--mantine-color-black);
+}
+
+.productCardButtonGroup {
+  display: none;
+}
