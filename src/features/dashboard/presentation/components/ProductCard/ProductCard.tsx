@@ -9,7 +9,7 @@ import {
   Button,
 } from "@mantine/core";
 import classes from "./ProductCard.module.css";
-import { ProductEntity } from "../../../../../shared/domain/entities/Product.entity";
+import { ProductEntity } from "../../../../../shared/domain/entities/product.entity";
 import SkeletonCard from "./SkeletonCard";
 import DeleteProductButton from "./delete/DeleteProductButton";
 
@@ -19,11 +19,11 @@ export default function ProductCard({ product }: { product?: ProductEntity }) {
   const statusColor = () => {
     switch (product!.status) {
       case "Active":
-        return "var(--mantine-color-indigo-9";
+        return "green.8";
       case "Inactive":
-        return "var(--mantine-color-gray-9)";
+        return "gray.7";
       case "Pending":
-        return "var(--mantine-color-blue-7)";
+        return "blue.5";
     }
   };
 
@@ -42,13 +42,13 @@ export default function ProductCard({ product }: { product?: ProductEntity }) {
       className={classes.productCard}
     >
       <Card.Section pos="relative" h="50%">
-        <Image src={product.imageUrl} alt="Norway" mah="100%" />
+        <Image src={product.imageUrl} alt="Product Image" fallbackSrc="https://placehold.co/600x400?text=Error" mah="100%" />
         <Badge
           color={statusColor()}
           pos="absolute"
           top={10}
           right={10}
-          w="30%"
+          miw="30%"
           className={classes.statusBadge}
         >
           {product.status}

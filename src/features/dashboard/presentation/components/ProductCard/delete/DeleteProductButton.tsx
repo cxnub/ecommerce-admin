@@ -1,7 +1,7 @@
 import { Button, Group, Modal, Text } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
-import { ProductEntity } from "../../../../../../shared/domain/entities/Product.entity";
+import { ProductEntity } from "../../../../../../shared/domain/entities/product.entity";
 import { notifications } from "@mantine/notifications";
 
 export default function DeleteProductButton({

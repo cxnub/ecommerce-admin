@@ -1,5 +1,5 @@
 import { AppShell, Burger, Button, Flex, Group, Title } from "@mantine/core";
-import ProductGridView from "../components/ProductView";
+import ProductGridView from "../components/ProductView/ProductView";
 import { useNavigate } from "react-router-dom";
 import { routeNames } from "../../../../config/routes";
 

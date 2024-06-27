@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 
 import "./index.css";
-import Navbar from "./components/navbar/Navbar";
+import Navbar from "./shared/presentation/components/navbar/Navbar";
 import { useDisclosure } from "@mantine/hooks";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -68,7 +68,7 @@ export default function App() {
           <RouterProvider router={router} />
         </AppShell>
       </MantineProvider>
-      <ReactQueryDevtools initialIsOpen={true} client={queryClient} />
+      <ReactQueryDevtools initialIsOpen={true} />
     </QueryClientProvider>
   );
 }

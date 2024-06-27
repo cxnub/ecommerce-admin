@@ -1,5 +1,4 @@
 import {
-  Title,
   Text,
   Button,
   Container,
@@ -16,12 +15,16 @@ export default function NotFoundPage() {
 
   return (
     <AppShell.Main>
-      <Flex justify="center" align="center" flex={1} h="100vh">
+      <Flex justify="center" align="center" flex={1} style={{ aspectRatio: 2 }}>
         <Container className={classes.root}>
-          <div className={classes.label}>404</div>
-          <Title className={classes.title}>
+          <div className={classes.label}>Hey there, traveller!</div>
+          <Text
+            className={classes.title}
+            variant="gradient"
+            gradient={{ from: "cyan", to: "grape", deg: 45 }}
+          >
             You have found a secret place.
-          </Title>
+          </Text>
           <Text
             c="dimmed"
             size="lg"
@@ -32,7 +35,11 @@ export default function NotFoundPage() {
             address, or the page has been moved to another URL.
           </Text>
           <Group justify="center">
-            <Button variant="subtle" size="md" onClick={() => navigate(routeNames.HomeScreen)}>
+            <Button
+              variant="subtle"
+              size="md"
+              onClick={() => navigate(routeNames.HomeScreen)}
+            >
               Take me back to home page
             </Button>
           </Group>
