@@ -5,12 +5,9 @@ import {
   localStorageColorSchemeManager,
   MantineProvider,
   createTheme,
-  AppShell,
 } from "@mantine/core";
 
 import "./index.css";
-import Navbar from "./shared/presentation/components/navbar/Navbar";
-import { useDisclosure } from "@mantine/hooks";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -42,8 +39,6 @@ const theme = createTheme({
 const queryClient = new QueryClient();
 
 export default function App() {
-  const [opened] = useDisclosure();
-
   return (
     <QueryClientProvider client={queryClient}>
       <MantineProvider
@@ -52,21 +47,7 @@ export default function App() {
         defaultColorScheme="light"
       >
         <Notifications limit={3} />
-        <AppShell
-          transitionDuration={500}
-          transitionTimingFunction="ease"
-          header={{ height: 60 }}
-          navbar={{
-            width: 300,
-            breakpoint: "sm",
-            collapsed: { mobile: !opened },
-          }}
-          padding="md"
-          layout="alt"
-        >
-          <Navbar />
-          <RouterProvider router={router} />
-        </AppShell>
+            <RouterProvider router={router} />
       </MantineProvider>
       <ReactQueryDevtools initialIsOpen={true} />
     </QueryClientProvider>

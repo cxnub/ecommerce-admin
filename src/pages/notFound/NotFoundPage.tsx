@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import classes from "./NotFoundPage.module.css";
 import { useNavigate } from "react-router-dom";
-import { routeNames } from "../config/routes";
+import { routeNames } from "../../config/routes";
 
 export default function NotFoundPage() {
   const navigate = useNavigate();

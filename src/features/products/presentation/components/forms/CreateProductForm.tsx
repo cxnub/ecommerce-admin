@@ -7,6 +7,7 @@ import {
   Card,
   Textarea,
   LoadingOverlay,
+  Flex,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
@@ -103,11 +104,16 @@ export default function CreateProductForm({
   });
 
   return (
-    <Card mih={500}>
-      <Card.Section h="50%">
-        <Image src={product.imageUrl} alt="Product Image" />
-      </Card.Section>
-      <Stack justify="flex-end" flex={1} mt={16}>
+    <Card mih={500} maw={{ base: "80%", xl: "40%" }}>
+      <Flex justify="center" align="center">
+        <Image
+          src={product.imageUrl}
+          alt="Product Image"
+          maw="50%"
+          fit="cover"
+        />
+      </Flex>
+      <Stack justify="flex-end" flex={1} mt={16} h="70%">
         <form
           onSubmit={form.onSubmit((values) => submitMutation.mutate(values))}
         >
@@ -135,9 +141,8 @@ export default function CreateProductForm({
           <Textarea
             {...form.getInputProps("description")}
             key={form.key("description")}
-            label="Description"
+            label="Description (optional)"
             placeholder="Enter product description"
-            required
           />
           <TextInput
             {...form.getInputProps("price")}
@@ -184,7 +189,7 @@ export default function CreateProductForm({
           <Button
             onClick={cancelFunction}
             value={SubmitType.Draft}
-            variant="outline"
+            variant="subtle"
             mt={16}
           >
             Cancel

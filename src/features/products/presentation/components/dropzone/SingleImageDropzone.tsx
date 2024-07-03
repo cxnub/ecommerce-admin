@@ -22,6 +22,7 @@ export default function SingleImageDropzone({ loading, onDrop }: ImageDropzonePr
   return (
     <div className={classes.wrapper}>
       <Dropzone
+        maw={{ base: "80%" }}
         openRef={openRef}
         onDrop={onDrop}
         className={classes.dropzone}

@@ -155,6 +155,8 @@ export default function AddMultipleProduct() {
                 analyzeProductsImageMutation.mutate(imageFiles);
               }}
               disabled={loading || imageFiles.length === 0}
+              variant="gradient"
+              gradient={{ from: "blue", to: "cyan", deg: 45 }}
             >
               Create Products
             </Button>

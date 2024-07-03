@@ -3,7 +3,7 @@ import ProductGridView from "../components/ProductView/ProductView";
 import { useNavigate } from "react-router-dom";
 import { routeNames } from "../../../../config/routes";
 
-export default function Dashboard() {
+export default function DashboardScreen() {
   const navigate = useNavigate();
 
   return (
