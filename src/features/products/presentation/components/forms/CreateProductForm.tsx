@@ -11,8 +11,8 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
-import { ProductEntity } from "../../../../../shared/domain/entities/product.entity";
-import { createProduct } from "../../../../../shared/data/api/product.api";
+import { ProductEntity } from "../../../../../shared/domain/entities/Product.entity";
+import { createProduct } from "../../../../../shared/data/api/Product.api";
 import { statusType } from "../../../../../shared/domain/enums/product.enum";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";

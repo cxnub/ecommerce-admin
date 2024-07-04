@@ -1,6 +1,6 @@
-import { ProductEntity } from "../../domain/entities/product.entity";
+import { ProductEntity } from "../../domain/entities/Product.entity";
 import MockProductData from "../MockProductData.json";
-import ProductFilters from "./productFilters";
+import ProductFilters from "./ProductFilters";
 
 type GetProductsReturnType = {
   products: ProductEntity[];

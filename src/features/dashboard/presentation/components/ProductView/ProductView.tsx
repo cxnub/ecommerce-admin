@@ -7,9 +7,9 @@ import ProductCard from "../ProductCard/ProductCard";
 import ScrollToTopButton from "../ScrollToTopButton";
 import StatusFilter from "../filters/StatusFilter";
 
-import { ProductEntity } from "../../../../../shared/domain/entities/product.entity";
-import ProductFilters from "../../../../../shared/data/api/productFilters";
-import { getProducts } from "../../../../../shared/data/api/product.api";
+import { ProductEntity } from "../../../../../shared/domain/entities/Product.entity";
+import ProductFilters from "../../../../../shared/data/api/ProductFilters";
+import { getProducts } from "../../../../../shared/data/api/Product.api";
 
 import classes from "./ProductView.module.css";
 

@@ -5,8 +5,8 @@ import { useState } from "react";
 
 import { useMutation } from "@tanstack/react-query";
 
-import { analyzeProductImage } from "../../../../shared/data/api/product.api";
-import { ProductEntity } from "../../../../shared/domain/entities/product.entity";
+import { analyzeProductImage } from "../../../../shared/data/api/Product.api";
+import { ProductEntity } from "../../../../shared/domain/entities/Product.entity";
 import SingleImageDropzone from "../components/dropzone/SingleImageDropzone";
 import CreateProductForm from "../components/forms/CreateProductForm";
 import AddProductHeader from "../components/header/AddProductsHeader";

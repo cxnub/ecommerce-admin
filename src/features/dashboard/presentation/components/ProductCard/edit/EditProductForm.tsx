@@ -16,8 +16,8 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { updateProduct } from "../../../../../../shared/data/api/product.api";
-import { ProductEntity } from "../../../../../../shared/domain/entities/product.entity";
+import { updateProduct } from "../../../../../../shared/data/api/Product.api";
+import { ProductEntity } from "../../../../../../shared/domain/entities/Product.entity";
 import { statusType } from "../../../../../../shared/domain/enums/product.enum";
 import CustomOverlayLoader from "../../../../../../shared/presentation/components/loader/CustomOverlayLoader";
 

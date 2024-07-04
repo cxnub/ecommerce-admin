@@ -1,6 +1,6 @@
 import { Button, Modal, Title } from "@mantine/core";
 import { useState } from "react";
-import { ProductEntity } from "../../../../../../shared/domain/entities/product.entity";
+import { ProductEntity } from "../../../../../../shared/domain/entities/Product.entity";
 import EditProductForm from "./EditProductForm";
 
 export default function EditProductButton({

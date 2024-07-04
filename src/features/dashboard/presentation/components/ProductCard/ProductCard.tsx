@@ -1,6 +1,6 @@
 import { Card, Image, Text, Badge, Stack, Group, Divider } from "@mantine/core";
 import classes from "./ProductCard.module.css";
-import { ProductEntity } from "../../../../../shared/domain/entities/product.entity";
+import { ProductEntity } from "../../../../../shared/domain/entities/Product.entity";
 import SkeletonCard from "./SkeletonCard";
 import DeleteProductButton from "./delete/DeleteProductButton";
 import EditProductButton from "./edit/EditProductButton";

@@ -13,7 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   analyzeProductImage,
   createProduct,
-} from "../../../../shared/data/api/product.api";
+} from "../../../../shared/data/api/Product.api";
 
 import JSZip from "jszip";
 
@@ -22,7 +22,7 @@ import AddProductHeader from "../components/header/AddProductsHeader";
 import MultipleImageDropzone from "../components/dropzone/MultipleImageDropzone";
 import { statusType } from "../../../../shared/domain/enums/product.enum";
 import ImageCard from "../components/imageCard/ImageCard";
-import { ProductEntity } from "../../../../shared/domain/entities/product.entity";
+import { ProductEntity } from "../../../../shared/domain/entities/Product.entity";
 import { useNavigate } from "react-router-dom";
 import { routeNames } from "../../../../config/routes";
 import classes from "./AddMultipleProduct.module.scss";
