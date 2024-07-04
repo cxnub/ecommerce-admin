@@ -20,7 +20,7 @@ import JSZip from "jszip";
 import { notifications } from "@mantine/notifications";
 import AddProductHeader from "../components/header/AddProductsHeader";
 import MultipleImageDropzone from "../components/dropzone/MultipleImageDropzone";
-import { statusType } from "../../../../shared/domain/enums/product.enum";
+import { statusType } from "../../../../shared/domain/enums/Product.enum";
 import ImageCard from "../components/imageCard/ImageCard";
 import { ProductEntity } from "../../../../shared/domain/entities/Product.entity";
 import { useNavigate } from "react-router-dom";

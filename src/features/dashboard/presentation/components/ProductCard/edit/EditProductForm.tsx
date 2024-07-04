@@ -18,7 +18,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { updateProduct } from "../../../../../../shared/data/api/Product.api";
 import { ProductEntity } from "../../../../../../shared/domain/entities/Product.entity";
-import { statusType } from "../../../../../../shared/domain/enums/product.enum";
+import { statusType } from "../../../../../../shared/domain/enums/Product.enum";
 import CustomOverlayLoader from "../../../../../../shared/presentation/components/loader/CustomOverlayLoader";
 
 import classes from "./EditProductForm.module.scss";
