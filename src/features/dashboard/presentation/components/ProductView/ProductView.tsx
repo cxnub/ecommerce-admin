@@ -1,6 +1,6 @@
 import { Pagination, SimpleGrid, Stack, Text } from "@mantine/core";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import ProductCard from "../ProductCard/ProductCard";
@@ -19,6 +19,11 @@ export default function ProductView() {
 
   // filter state
   const [statusFilter, setStatusFilter] = useState<number>(0);
+
+  // reset the current page when the status filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter]);
 
   // query products
   const { data, status } = useQuery({
@@ -74,6 +79,7 @@ export default function ProductView() {
         </SimpleGrid>
         <Pagination
           total={maxPages}
+          value={currentPage}
           onChange={(page) => {
             setCurrentPage(page);
 

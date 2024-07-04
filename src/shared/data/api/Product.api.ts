@@ -24,6 +24,9 @@ async function getProducts({
   productsPerPage?: number;
   filters?: ProductFilters;
 }): Promise<GetProductsReturnType> {
+  // set max pages
+  let maxPages = 1;
+
   // calculate the start and end index of the products
   const startIndex = (currentPage - 1) * productsPerPage;
   const endIndex = startIndex + productsPerPage;
@@ -36,13 +39,16 @@ async function getProducts({
     products = MockProductData.filter((product) => {
       return product.statusId === filters.statusFilter;
     });
+
+    // set the max number of pages
+    maxPages = Math.ceil(products.length / productsPerPage);
+  } else {
+    // set the max number of pages
+    maxPages = Math.ceil(MockProductData.length / productsPerPage);
   }
 
   // get the products for the current page
   products = products.slice(startIndex, endIndex);
-
-  // get the max number of pages
-  const maxPages = Math.ceil(MockProductData.length / productsPerPage);
 
   // simulate a delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -67,7 +73,7 @@ function updateProduct(product: ProductEntity): Promise<ProductEntity> {
   return new Promise((resolve) =>
     setTimeout(() => {
       // resolve the promise with the updated product
-       resolve(product);
+      resolve(product);
     }, 1000)
   );
 }
