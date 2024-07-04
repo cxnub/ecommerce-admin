@@ -25,6 +25,7 @@ import ImageCard from "../components/imageCard/ImageCard";
 import { ProductEntity } from "../../../../shared/domain/entities/product.entity";
 import { useNavigate } from "react-router-dom";
 import { routeNames } from "../../../../config/routes";
+import classes from "./AddMultipleProduct.module.scss";
 
 export default function AddMultipleProduct() {
   const navigate = useNavigate();
@@ -154,6 +155,7 @@ export default function AddMultipleProduct() {
                 // start the mutation
                 analyzeProductsImageMutation.mutate(imageFiles);
               }}
+              className={classes.createButton}
               disabled={loading || imageFiles.length === 0}
               variant="gradient"
               gradient={{ from: "blue", to: "cyan", deg: 45 }}

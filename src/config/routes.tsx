@@ -1,18 +1,19 @@
-import { Outlet, createBrowserRouter } from "react-router-dom";
+import { Navigate, Outlet, createBrowserRouter } from "react-router-dom";
 import Dashboard from "../features/dashboard/presentation/screens/dashboard.screen";
-import NotFoundPage from "../pages/notFound/NotFoundPage";
 import AddSingleProductScreen from "../features/products/presentation/screens/AddSingleProduct.screen";
 import AddMultipleProductsScreen from "../features/products/presentation/screens/AddMultipleProduct.screen";
 import { ProtectedRouteLayout } from "../shared/presentation/components/auth/ProtectedRouteLayout";
 import { AuthProvider } from "../shared/presentation/components/auth/AuthProvider";
 import { AnonymousRoute } from "../shared/presentation/components/auth/AnonymousRoute";
 import { LandingPage } from "../features/auth/presentation/screens/LandingPage";
+import { ConditionalNotFoundPage } from "../pages/notFound/ConditionalNotFoundPage";
 
 const enum routeNames {
   LandingScreen = "/",
   HomeScreen = "/dashboard",
-  AddSingleProductScreen = "addSingleProduct",
-  AddMultipleProductsScreen = "addMultipleProducts",
+  AddSingleProductScreen = "/addSingleProduct",
+  AddMultipleProductsScreen = "/addMultipleProducts",
+  NotFoundPage = "/not-found",
 }
 
 const anonymousRoutes = [
@@ -22,7 +23,7 @@ const anonymousRoutes = [
   },
 ];
 
-// 
+//
 const protectedRoutes = [
   {
     path: routeNames.HomeScreen,
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
         <Outlet />
       </AuthProvider>
     ),
+    errorElement: <Navigate to={routeNames.NotFoundPage} />,
     children: [
       {
         element: <AnonymousRoute />,
@@ -52,8 +54,11 @@ const router = createBrowserRouter([
       },
       {
         element: <ProtectedRouteLayout />,
-        errorElement: <NotFoundPage />,
         children: protectedRoutes,
+      },
+      {
+        path: routeNames.NotFoundPage,
+        element: <ConditionalNotFoundPage />,
       },
     ],
   },

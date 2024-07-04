@@ -1,4 +1,12 @@
-import { AppShell, Button, Code, Group, Text, useComputedColorScheme, useMantineColorScheme } from "@mantine/core";
+import {
+  AppShell,
+  Button,
+  Code,
+  Group,
+  Text,
+  useComputedColorScheme,
+  useMantineColorScheme,
+} from "@mantine/core";
 import {
   IconLogout,
   IconPackage,
@@ -7,7 +15,7 @@ import {
   IconSun,
   IconMoon,
 } from "@tabler/icons-react";
-import classes from "./Navbar.module.css";
+import classes from "./Navbar.module.scss";
 import { useAuth } from "../../../../hooks/useAuth";
 
 const data = [
@@ -20,10 +28,10 @@ export default function NavbarSimple() {
   const { logout } = useAuth();
 
   const { setColorScheme } = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme('light');
+  const computedColorScheme = useComputedColorScheme("light");
 
   const toggleColorScheme = () => {
-    setColorScheme(computedColorScheme === 'dark' ? 'light' : 'dark');
+    setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
   };
 
   const links = data.map((item) => (
@@ -41,21 +49,30 @@ export default function NavbarSimple() {
 
   return (
     <AppShell.Navbar>
-      <nav className={classes.navbar} >
+      <nav className={classes.navbar}>
         <div className={classes.navbarMain}>
           <Group className={classes.header} justify="space-between">
-            <Text fw={500}>Ecommerce Admin<br></br>Dashboard</Text>
+            <Text fw={500}>
+              Ecommerce Admin<br></br>Dashboard
+            </Text>
             <Button variant="subtle" size="sm" onClick={toggleColorScheme}>
-              {computedColorScheme === "dark" ? <IconMoon color="#F5F3CE" /> : <IconSun color="#F28C38" />}
+              {computedColorScheme === "dark" ? (
+                <IconMoon color="#F5F3CE" />
+              ) : (
+                <IconSun color="#F28C38" />
+              )}
             </Button>
           </Group>
           {links}
         </div>
 
         <div className={classes.footer}>
-            <Text size="sm" fw={500}>
-              Logged in as <Code fz="sm" fw={500}>cxnub</Code>
-            </Text>
+          <Text size="sm" fw={500}>
+            Logged in as{" "}
+            <Code fz="sm" fw={500} className={classes.user}>
+              cxnub
+            </Code>
+          </Text>
 
           <a
             href="#"

@@ -47,7 +47,7 @@ export default function DeleteProductButton({
           permanently.
         </Text>
         <Group mt={16} justify="flex-end">
-          <Button>Cancel</Button>
+          <Button onClick={() => setOpened(false)}>Cancel</Button>
           <Button color="red" onClick={handleDelete}>
             Delete
           </Button>

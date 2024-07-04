@@ -1,0 +1,8 @@
+.imageOverlay {
+    position: absolute;
+    visibility: hidden;
+}
+
+.image:hover .imageOverlay {
+    visibility: visible;
+}

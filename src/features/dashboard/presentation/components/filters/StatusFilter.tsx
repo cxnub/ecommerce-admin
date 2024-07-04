@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FloatingIndicator, UnstyledButton } from "@mantine/core";
-import classes from "./StatusFilter.module.css";
+import classes from "./StatusFilter.module.scss";
 
 const data = ["All", "Active", "Inactive", "Pending"];
 

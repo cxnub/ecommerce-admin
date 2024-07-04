@@ -4,52 +4,60 @@ import {
   TextInput,
   Image,
   Stack,
-  Card,
   Textarea,
+  Text,
   LoadingOverlay,
   Flex,
+  Overlay,
+  Center,
+  FileInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useState } from "react";
-import { ProductEntity } from "../../../../../shared/domain/entities/product.entity";
-import { createProduct } from "../../../../../shared/data/api/product.api";
-import { statusType } from "../../../../../shared/domain/enums/product.enum";
-import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { routeNames } from "../../../../../config/routes";
 import { notifications } from "@mantine/notifications";
-import CustomOverlayLoader from "../../../../../shared/presentation/components/loader/CustomOverlayLoader";
+import { useMutation } from "@tanstack/react-query";
+import { useRef, useState } from "react";
+import { updateProduct } from "../../../../../../shared/data/api/product.api";
+import { ProductEntity } from "../../../../../../shared/domain/entities/product.entity";
+import { statusType } from "../../../../../../shared/domain/enums/product.enum";
+import CustomOverlayLoader from "../../../../../../shared/presentation/components/loader/CustomOverlayLoader";
+
+import classes from "./EditProductForm.module.scss";
 
 enum SubmitType {
   Publish = "publish",
   Draft = "draft",
 }
 
-type CreateProductFormProps = {
+type EditProductFormProps = {
   product: ProductEntity;
   cancelFunction: () => void;
+  setOpened: (value: boolean) => void;
 };
 
 type FormData = {
+  imageUrl: string;
   name: string;
   description: string;
   price: number;
   categoryId: number;
 };
 
-export default function CreateProductForm({
+export default function EditProductForm({
   product,
   cancelFunction,
-}: CreateProductFormProps) {
-  const navigate = useNavigate();
+  setOpened,
+}: EditProductFormProps) {
   const [submitType, setSubmitType] = useState<SubmitType | null>(null);
+  const imageInputRef = useRef<HTMLButtonElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
+      imageUrl: product.imageUrl!,
       name: product.name!,
       description: product.description!,
-      price: 0,
+      price: product.price!,
       categoryId: product.categoryId!,
     },
     validate: {
@@ -74,7 +82,6 @@ export default function CreateProductForm({
   const handleSubmit = (values: FormData) => {
     const newProduct = new ProductEntity({
       ...values,
-      imageUrl: product.imageUrl!,
       statusId:
         submitType === SubmitType.Publish
           ? statusType.ACTIVE
@@ -83,20 +90,22 @@ export default function CreateProductForm({
       updatedAt: new Date().toString(),
     });
 
-    return createProduct(newProduct);
+    console.log(newProduct);
+
+    return updateProduct(newProduct);
   };
 
   const submitMutation = useMutation({
     mutationFn: handleSubmit,
     onSuccess: () => {
-      navigate(routeNames.HomeScreen);
+      setOpened(false);
       notifications.show({
         title: `Product ${
-          submitType == SubmitType.Publish ? "Published" : "Saved"
+          submitType == SubmitType.Publish ? "Updated" : "Saved"
         } Successfully`,
         message:
           submitType === SubmitType.Publish
-            ? "Your product has been published!"
+            ? "Your product has been updated!"
             : "Your product has been saved as draft",
         color: "teal",
       });
@@ -104,14 +113,31 @@ export default function CreateProductForm({
   });
 
   return (
-    <Card mih={500} maw={{ base: "80%", xl: "40%" }}>
-      <Flex justify="center" align="center">
+    <>
+      <Flex
+        className={classes.image}
+        justify="center"
+        align="center"
+        pos="relative"
+      >
         <Image
-          src={product.imageUrl}
+          ref={imageRef}
+          src={form.values.imageUrl}
+          fallbackSrc="	https://placehold.co/600x400?text=Error"
           alt="Product Image"
           maw="50%"
           fit="cover"
         />
+        <Overlay
+          className={classes.imageOverlay}
+          component="button"
+          blur={1}
+          onClick={() => imageInputRef.current?.click()}
+        >
+          <Center h="100%">
+            <Text>Edit Image</Text>
+          </Center>
+        </Overlay>
       </Flex>
       <Stack justify="flex-end" flex={1} mt={16} h="70%">
         <form
@@ -124,12 +150,29 @@ export default function CreateProductForm({
                 <CustomOverlayLoader
                   text={
                     submitType === SubmitType.Publish
-                      ? "Publishing product..."
+                      ? "Updating product..."
                       : "Saving product as draft..."
                   }
                 />
               ),
             }}
+          />
+          <FileInput
+            {...form.getInputProps("imageUrl")}
+            unstyled
+            hidden
+            onChange={(file) => {
+              if (file) {
+                // update image preview
+                form.setFieldValue('imageUrl', URL.createObjectURL(file));
+
+                // update image src
+                imageRef!.current!.src = URL.createObjectURL(file);
+              }
+            }}
+            key={form.key("imageUrl")}
+            ref={imageInputRef}
+            accept="image/png,image/jpeg"
           />
           <TextInput
             {...form.getInputProps("name")}
@@ -141,9 +184,11 @@ export default function CreateProductForm({
           <Textarea
             {...form.getInputProps("description")}
             key={form.key("description")}
+            resize="vertical"
             autosize={true}
-            maxRows={5}
             minRows={3}
+            maxRows={5}
+            maxLength={1000}
             label="Description (optional)"
             placeholder="Enter product description"
           />
@@ -199,6 +244,6 @@ export default function CreateProductForm({
           </Button>
         </form>
       </Stack>
-    </Card>
+    </>
   );
 }

@@ -1,17 +1,9 @@
-import {
-  Card,
-  Image,
-  Text,
-  Badge,
-  Stack,
-  Group,
-  Divider,
-  Button,
-} from "@mantine/core";
+import { Card, Image, Text, Badge, Stack, Group, Divider } from "@mantine/core";
 import classes from "./ProductCard.module.css";
 import { ProductEntity } from "../../../../../shared/domain/entities/product.entity";
 import SkeletonCard from "./SkeletonCard";
 import DeleteProductButton from "./delete/DeleteProductButton";
+import EditProductButton from "./edit/EditProductButton";
 
 // type ProductCardProps = {};
 
@@ -42,7 +34,12 @@ export default function ProductCard({ product }: { product?: ProductEntity }) {
       className={classes.productCard}
     >
       <Card.Section pos="relative" h="50%">
-        <Image src={product.imageUrl} alt="Product Image" fallbackSrc="https://placehold.co/600x400?text=Error" mah="100%" />
+        <Image
+          src={product.imageUrl}
+          alt="Product Image"
+          fallbackSrc="https://placehold.co/600x400?text=Error"
+          mah="100%"
+        />
         <Badge
           color={statusColor()}
           pos="absolute"
@@ -64,14 +61,12 @@ export default function ProductCard({ product }: { product?: ProductEntity }) {
         <Text c="dimmed" lineClamp={3}>
           {product.description}
         </Text>
-        <Text c="dimmed">$430</Text>
+        <Text c="dimmed">${product.price?.toFixed(2)}</Text>
         <Group
           justify="space-evenly"
           className={classes.productCardButtonGroup}
         >
-          <Button flex={1} variant="subtle">
-            EDIT
-          </Button>
+          <EditProductButton product={product} />
           <Divider orientation="vertical" />
           <DeleteProductButton product={product} />
         </Group>

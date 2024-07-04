@@ -51,6 +51,7 @@ async function getProducts({
   return Promise.resolve({
     products: products.map((product) => new ProductEntity(product)),
     maxPages,
+    filters,
   });
 }
 
@@ -61,7 +62,14 @@ async function getProducts({
  */
 function updateProduct(product: ProductEntity): Promise<ProductEntity> {
   product.updatedAt = new Date();
-  return Promise.resolve(product);
+
+  // simulate a delay
+  return new Promise((resolve) =>
+    setTimeout(() => {
+      // resolve the promise with the updated product
+       resolve(product);
+    }, 1000)
+  );
 }
 
 /**
