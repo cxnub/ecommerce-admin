@@ -2,12 +2,16 @@ import {
   Button,
   NativeSelect,
   TextInput,
+  Text,
   Image,
   Stack,
   Card,
   Textarea,
   LoadingOverlay,
   Flex,
+  Group,
+  Switch,
+  Tooltip,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState } from "react";
@@ -19,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { routeNames } from "../../../../../config/routes";
 import { notifications } from "@mantine/notifications";
 import CustomOverlayLoader from "../../../../../shared/presentation/components/loader/CustomOverlayLoader";
+import { IconInfoCircle } from "@tabler/icons-react";
 
 enum SubmitType {
   Publish = "publish",
@@ -27,6 +32,7 @@ enum SubmitType {
 
 type CreateProductFormProps = {
   product: ProductEntity;
+  confidence: number;
   cancelFunction: () => void;
 };
 
@@ -37,12 +43,25 @@ type FormData = {
   categoryId: number;
 };
 
+const categories: { [key: number]: string } = {
+  1: "Bracelet",
+  2: "Earring",
+  3: "Hat",
+  4: "Necklace",
+  5: "Sunglasses",
+  6: "Wallet",
+  7: "Wristwatch",
+};
+
 export default function CreateProductForm({
   product,
+  confidence,
   cancelFunction,
 }: CreateProductFormProps) {
   const navigate = useNavigate();
   const [submitType, setSubmitType] = useState<SubmitType | null>(null);
+
+  const predictedCategory = categories[product.categoryId!];
 
   const form = useForm({
     mode: "uncontrolled",
@@ -51,6 +70,7 @@ export default function CreateProductForm({
       description: product.description!,
       price: 0,
       categoryId: product.categoryId!,
+      toggleStatus: false,
     },
     validate: {
       name: (value) => {
@@ -71,22 +91,25 @@ export default function CreateProductForm({
     },
   });
 
-  const handleSubmit = (values: FormData) => {
+  const handleSubmit = async (values: FormData) => {
     const newProduct = new ProductEntity({
       ...values,
       imageUrl: product.imageUrl!,
       statusId:
         submitType === SubmitType.Publish
-          ? statusType.ACTIVE
+          ? form.values.toggleStatus
+            ? statusType.ACTIVE
+            : statusType.INACTIVE
           : statusType.PENDING_REVIEW,
       createdAt: new Date().toString(),
       updatedAt: new Date().toString(),
     });
 
-    return createProduct(newProduct);
+    return await createProduct(newProduct);
   };
 
   const submitMutation = useMutation({
+    mutationKey: ["createProduct"],
     mutationFn: handleSubmit,
     onSuccess: () => {
       navigate(routeNames.HomeScreen);
@@ -99,6 +122,14 @@ export default function CreateProductForm({
             ? "Your product has been published!"
             : "Your product has been saved as draft",
         color: "teal",
+      });
+    },
+
+    onError: () => {
+      notifications.show({
+        title: "Error creating product",
+        message: "Failed to create product, please try again.",
+        color: "red",
       });
     },
   });
@@ -151,6 +182,7 @@ export default function CreateProductForm({
             {...form.getInputProps("price")}
             key={form.key("price")}
             type="number"
+            step="0.01"
             label="Price"
             placeholder="Enter product price"
             required
@@ -158,7 +190,17 @@ export default function CreateProductForm({
           <NativeSelect
             {...form.getInputProps("category")}
             key={form.key("category")}
-            label="Category"
+            defaultValue={product.categoryId}
+            label={
+              <Group pt={8}>
+                <Text>Category </Text>
+                <Tooltip
+                  label={`Predicted category: ${predictedCategory}, confidence: ${confidence.toPrecision(4)}%`}
+                >
+                  <IconInfoCircle size={20} />
+                </Tooltip>
+              </Group>
+            }
             data={[
               { value: "1", label: "Bracelet" },
               { value: "2", label: "Earring" },
@@ -170,6 +212,18 @@ export default function CreateProductForm({
             ]}
             required
           />
+          <Group mt={16}>
+            <Switch
+              {...form.getInputProps("statusId")}
+              key={form.key("statusId")}
+              label="Set product as active"
+              color="blue"
+            />
+            <Tooltip label="Set a status to your product. The status will only apply if you publish the product.">
+              <IconInfoCircle size={20} />
+            </Tooltip>
+          </Group>
+
           <Button
             type="submit"
             onClick={() => setSubmitType(SubmitType.Publish)}

@@ -10,17 +10,13 @@ import {
 import { useState } from "react";
 
 import { useMutation } from "@tanstack/react-query";
-import {
-  analyzeProductImage,
-  createProduct,
-} from "../../../../shared/data/api/Product.api";
+import { analyzeProductImage } from "../../../../shared/data/api/Product.api";
 
 import JSZip from "jszip";
 
 import { notifications } from "@mantine/notifications";
 import AddProductHeader from "../components/header/AddProductsHeader";
 import MultipleImageDropzone from "../components/dropzone/MultipleImageDropzone";
-import { statusType } from "../../../../shared/domain/enums/Product.enum";
 import ImageCard from "../components/imageCard/ImageCard";
 import { ProductEntity } from "../../../../shared/domain/entities/Product.entity";
 import { useNavigate } from "react-router-dom";
@@ -32,14 +28,12 @@ export default function AddMultipleProduct() {
 
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [processedProducts, setProcessedProducts] = useState<ProductEntity[]>(
-    []
-  );
+  const [processedProductIds, setProcessedProductIds] = useState<number[]>([]);
 
   const handleImageUpload = (files: File[]) => {
     for (const file of files) {
       console.log("File detected: ", file.name);
-      if (file.name.endsWith(".png") || file.name.endsWith(".jpg")) {
+      if (file.name.endsWith(".png") || file.name.endsWith(".jpg") || file.name.endsWith(".jpeg")) {
         setImageFiles((prevImages) => [...prevImages, file]);
         continue;
       }
@@ -53,7 +47,7 @@ export default function AddMultipleProduct() {
         // Get the image files
         unzipped.forEach((_, file) => {
           // Check if the file is an image
-          if (file.name.endsWith(".png") || file.name.endsWith(".jpg")) {
+          if (file.name.endsWith(".png") || file.name.endsWith(".jpg") || file.name.endsWith(".jpeg")) {
             // convert the file to a blob
             file.async("blob").then((blob) => {
               // Create a new file
@@ -78,23 +72,15 @@ export default function AddMultipleProduct() {
 
     for (const file of files) {
       // Analyze the product image
-      const analyzedProductData = await analyzeProductImage(file).then(
-        (product) => {
-          // Set the product status to pending review
-          product.statusId = statusType.PENDING_REVIEW;
+      await analyzeProductImage(file, true).then((data) => {
+        const [product] = data;
 
-          // Set the product creation and update date
-          product.createdAt = product.updatedAt = new Date();
-
-          return product;
-        }
-      );
-
-      // Create the product
-      await createProduct(analyzedProductData).then(async (product) => {
         // Set the product
         products.push(product);
-        setProcessedProducts((prevProducts) => [...prevProducts, product]);
+        setProcessedProductIds((prevProducts) => [
+          ...prevProducts,
+          product.id!,
+        ]);
 
         // remove the image from the imageFiles
         setImageFiles((prevImages) =>
@@ -150,7 +136,7 @@ export default function AddMultipleProduct() {
             <Button
               onClick={() => {
                 // reset processed products
-                setProcessedProducts([]);
+                setProcessedProductIds([]);
 
                 // start the mutation
                 analyzeProductsImageMutation.mutate(imageFiles);
@@ -166,8 +152,8 @@ export default function AddMultipleProduct() {
               <Progress
                 display={loading ? "block" : "none"}
                 value={
-                  (processedProducts.length /
-                    (processedProducts.length + imageFiles.length)) *
+                  (processedProductIds.length /
+                    (processedProductIds.length + imageFiles.length)) *
                   100
                 }
                 color="blue"
@@ -178,9 +164,9 @@ export default function AddMultipleProduct() {
             )}
             <Text>
               {loading
-                ? processedProducts.length +
+                ? processedProductIds.length +
                   " product(s) created out of " +
-                  (imageFiles.length + processedProducts.length).toString()
+                  (imageFiles.length + processedProductIds.length).toString()
                 : imageFiles.length + " image(s) selected"}
             </Text>
             <SimpleGrid

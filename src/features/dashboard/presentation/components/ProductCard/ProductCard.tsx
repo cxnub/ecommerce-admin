@@ -39,6 +39,7 @@ export default function ProductCard({ product }: { product?: ProductEntity }) {
           alt="Product Image"
           fallbackSrc="https://placehold.co/600x400?text=Error"
           mah="100%"
+          style={{ objectFit: "contain" }}
         />
         <Badge
           color={statusColor()}

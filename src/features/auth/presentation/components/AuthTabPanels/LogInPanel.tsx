@@ -6,9 +6,18 @@ import {
   PasswordInput,
   Button,
   Anchor,
+  LoadingOverlay,
 } from "@mantine/core";
 import classes from "./AuthTabPanels.module.scss";
 import { useAuth } from "../../../../../hooks/useAuth";
+import { useForm } from "@mantine/form";
+import { useMutation } from "@tanstack/react-query";
+import {
+  AuthError,
+  loginData,
+} from "../../../../../shared/presentation/components/auth/AuthProvider";
+import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
 
 export const LogInPanel = ({
   setActiveTab,
@@ -16,6 +25,45 @@ export const LogInPanel = ({
   setActiveTab: (value: string) => void;
 }) => {
   const { login } = useAuth();
+  const [visible, { toggle: toggleOverlay }] = useDisclosure(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const form = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      email: "",
+      password: "",
+    },
+
+    validate: {
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      password: (value) => {
+        if (value.length < 6) {
+          return "Password must be at least 6 characters long";
+        }
+      },
+    },
+  });
+
+  const loginMutation = useMutation({
+    mutationKey: ["login"],
+    mutationFn: (data: loginData) => {
+      setErrorMessage(null);
+      return login(data);
+    },
+
+    onMutate: toggleOverlay,
+    onSuccess: toggleOverlay,
+    onError: (error) => {
+      toggleOverlay();
+
+      if (error instanceof AuthError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Something went wrong, please try again later.");
+      }
+    },
+  });
 
   return (
     <Tabs.Panel value="login">
@@ -23,26 +71,37 @@ export const LogInPanel = ({
         Welcome back to Ecommerce Admin!
       </Title>
 
-      <TextInput
-        label="Email address"
-        placeholder="hello@gmail.com"
-        size="md"
-      />
-      <PasswordInput
-        label="Password"
-        placeholder="Your password"
-        mt="md"
-        size="md"
-      />
-      <Button
-        variant="gradient"
-        fullWidth
-        mt="xl"
-        size="md"
-        onClick={() => login("token")}
-      >
-        Login
-      </Button>
+      <form onSubmit={form.onSubmit((data) => loginMutation.mutate(data))}>
+        <TextInput
+          label="Email address"
+          placeholder="hello@gmail.com"
+          size="md"
+          key={form.key("email")}
+          {...form.getInputProps("email")}
+        />
+        <PasswordInput
+          label="Password"
+          placeholder="Your password"
+          mt="md"
+          size="md"
+          key={form.key("password")}
+          {...form.getInputProps("password")}
+        />
+        <Button
+          variant="gradient"
+          fullWidth
+          mt="xl"
+          size="md"
+          type="submit"
+          disabled={visible}
+        >
+          <LoadingOverlay visible={visible} loaderProps={{ size: "sm" }} />
+          Login
+        </Button>
+        <Text c="red" pt="sm" ps="sm">
+          {errorMessage}
+        </Text>
+      </form>
 
       <Text ta="center" mt="md">
         Don&apos;t have an account?{" "}

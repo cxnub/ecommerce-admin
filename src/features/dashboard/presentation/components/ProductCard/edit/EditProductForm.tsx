@@ -11,10 +11,13 @@ import {
   Overlay,
   Center,
   FileInput,
+  Switch,
+  Tooltip,
+  Group,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { updateProduct } from "../../../../../../shared/data/api/Product.api";
 import { ProductEntity } from "../../../../../../shared/domain/entities/Product.entity";
@@ -22,6 +25,7 @@ import { statusType } from "../../../../../../shared/domain/enums/Product.enum";
 import CustomOverlayLoader from "../../../../../../shared/presentation/components/loader/CustomOverlayLoader";
 
 import classes from "./EditProductForm.module.scss";
+import { IconInfoCircle } from "@tabler/icons-react";
 
 enum SubmitType {
   Publish = "publish",
@@ -40,6 +44,7 @@ type FormData = {
   description: string;
   price: number;
   categoryId: number;
+  toggleStatus: boolean;
 };
 
 export default function EditProductForm({
@@ -51,6 +56,8 @@ export default function EditProductForm({
   const imageInputRef = useRef<HTMLButtonElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
+  const queryClient = useQueryClient();
+
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
@@ -59,6 +66,7 @@ export default function EditProductForm({
       description: product.description!,
       price: product.price!,
       categoryId: product.categoryId!,
+      toggleStatus: product.statusId == statusType.ACTIVE ? true : false,
     },
     validate: {
       name: (value) => {
@@ -79,20 +87,32 @@ export default function EditProductForm({
     },
   });
 
-  const handleSubmit = (values: FormData) => {
+  const handleSubmit = async (values: FormData) => {
     const newProduct = new ProductEntity({
-      ...values,
+      name: values.name,
+      description: values.description,
+      price: parseFloat(values.price.toString()),
+      id: product.id,
+      imageUrl: product.imageUrl!,
+      categoryId: parseInt(values.categoryId.toString()),
       statusId:
         submitType === SubmitType.Publish
-          ? statusType.ACTIVE
+          ? values.toggleStatus ? statusType.INACTIVE : statusType.ACTIVE
           : statusType.PENDING_REVIEW,
       createdAt: new Date().toString(),
       updatedAt: new Date().toString(),
     });
 
-    console.log(newProduct);
+    // check if image has changed
+    if (values.imageUrl !== product.imageUrl) {
+      // fetch image
+      const blob = await fetch(values.imageUrl).then((r) => r.blob());
 
-    return updateProduct(newProduct);
+      // update product with image
+      return await updateProduct(newProduct, blob);
+    }
+
+    return await updateProduct(newProduct);
   };
 
   const submitMutation = useMutation({
@@ -108,6 +128,16 @@ export default function EditProductForm({
             ? "Your product has been updated!"
             : "Your product has been saved as draft",
         color: "teal",
+      });
+
+      return queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+
+    onError: () => {
+      notifications.show({
+        title: "Edit product failed",
+        message: "Failed to update product, please try again.",
+        color: "red",
       });
     },
   });
@@ -164,7 +194,7 @@ export default function EditProductForm({
             onChange={(file) => {
               if (file) {
                 // update image preview
-                form.setFieldValue('imageUrl', URL.createObjectURL(file));
+                form.setFieldValue("imageUrl", URL.createObjectURL(file));
 
                 // update image src
                 imageRef!.current!.src = URL.createObjectURL(file);
@@ -196,13 +226,14 @@ export default function EditProductForm({
             {...form.getInputProps("price")}
             key={form.key("price")}
             type="number"
+            step="0.01"
             label="Price"
             placeholder="Enter product price"
             required
           />
           <NativeSelect
-            {...form.getInputProps("category")}
-            key={form.key("category")}
+            {...form.getInputProps("categoryId")}
+            key={form.key("categoryId")}
             label="Category"
             data={[
               { value: "1", label: "Bracelet" },
@@ -215,6 +246,19 @@ export default function EditProductForm({
             ]}
             required
           />
+          <Group mt={16}>
+            <Switch
+              {...form.getInputProps("statusId")}
+              key={form.key("statusId")}
+              defaultChecked={form.values.toggleStatus}
+              label="Set product as active"
+              color="blue"
+            />
+            <Tooltip label="Set a status to your product. The status will only apply if you publish the product.">
+              <IconInfoCircle size={20} />
+            </Tooltip>
+          </Group>
+
           <Button
             type="submit"
             onClick={() => setSubmitType(SubmitType.Publish)}

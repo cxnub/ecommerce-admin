@@ -4,6 +4,7 @@ import {
   Code,
   Group,
   Text,
+  Tooltip,
   useComputedColorScheme,
   useMantineColorScheme,
 } from "@mantine/core";
@@ -25,7 +26,7 @@ const data = [
 ];
 
 export default function NavbarSimple() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme("light");
@@ -69,9 +70,11 @@ export default function NavbarSimple() {
         <div className={classes.footer}>
           <Text size="sm" fw={500}>
             Logged in as{" "}
+            <Tooltip label={user?.email}>
             <Code fz="sm" fw={500} className={classes.user}>
-              cxnub
+              {user?.username}
             </Code>
+            </Tooltip>
           </Text>
 
           <a

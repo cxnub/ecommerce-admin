@@ -14,6 +14,7 @@ import AddProductHeader from "../components/header/AddProductsHeader";
 export default function AddSingleProductScreen() {
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState<ProductEntity | null>(null);
+  const [confidence, setConfidence] = useState(0);
 
   const handleImageUpload = async (file: File) => {
     setLoading(true);
@@ -23,7 +24,9 @@ export default function AddSingleProductScreen() {
   const analyzeProductImageMutation = useMutation({
     mutationFn: handleImageUpload,
     onSuccess: (data) => {
-      setProduct(data);
+      const [product, confidence] = data;
+      setProduct(product);
+      setConfidence(confidence);
       setLoading(false);
     },
     onError: (error) => {
@@ -51,6 +54,7 @@ export default function AddSingleProductScreen() {
           ) : (
             <CreateProductForm
               product={product}
+              confidence={confidence}
               cancelFunction={() => setProduct(null)}
             />
           )}

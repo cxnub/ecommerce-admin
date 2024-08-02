@@ -3,6 +3,8 @@ import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { ProductEntity } from "../../../../../../shared/domain/entities/Product.entity";
 import { notifications } from "@mantine/notifications";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteProduct } from "../../../../../../shared/data/api/Product.api";
 
 export default function DeleteProductButton({
   product,
@@ -10,26 +12,30 @@ export default function DeleteProductButton({
   product: ProductEntity;
 }) {
   const [opened, setOpened] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleDelete = async () => {
-    setOpened(false);
-    notifications.show({
-      title: "Product Deleted Successfully",
-      message: (
-        <>
-          <Text>
-            <b>{product.name}</b> has been deleted from the database.
-          </Text>
-          <Text c="blue" component="button">Undo</Text>
-        </>
-      ),
-      color: "green",
-      onClose: () => {
-        console.log("Delete product here");
-      },
-      autoClose: 3000,
-    });
-  };
+  const deleteMutation = useMutation({
+    mutationFn: async (productId: number) => {
+      setOpened(false);
+      await deleteProduct(productId);
+      return productId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      notifications.show({
+        title: "Success",
+        message: "Product deleted successfully",
+        color: "green",
+      });
+    },
+    onError: () => {
+      notifications.show({
+        title: "Error",
+        message: "Failed to delete product",
+        color: "red",
+      });
+    },
+  });
 
   return (
     <>
@@ -48,7 +54,7 @@ export default function DeleteProductButton({
         </Text>
         <Group mt={16} justify="flex-end">
           <Button onClick={() => setOpened(false)}>Cancel</Button>
-          <Button color="red" onClick={handleDelete}>
+          <Button color="red" onClick={() => deleteMutation.mutate(product.id!)}>
             Delete
           </Button>
         </Group>

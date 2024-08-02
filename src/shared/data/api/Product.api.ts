@@ -1,6 +1,7 @@
 import { ProductEntity } from "../../domain/entities/Product.entity";
-import MockProductData from "../MockProductData.json";
 import ProductFilters from "./productFilters";
+import { Buffer } from "buffer";
+import api from "../../../config/api";
 
 type GetProductsReturnType = {
   products: ProductEntity[];
@@ -24,110 +25,123 @@ async function getProducts({
   productsPerPage?: number;
   filters?: ProductFilters;
 }): Promise<GetProductsReturnType> {
-  // set max pages
-  let maxPages = 1;
+  const response = await api.post("/products", {
+    page: currentPage,
+    limit: productsPerPage,
+    statusIds: filters.statusFilter ? [filters.statusFilter] : null,
+  });
 
-  // calculate the start and end index of the products
-  const startIndex = (currentPage - 1) * productsPerPage;
-  const endIndex = startIndex + productsPerPage;
-
-  // get all the products
-  let products = MockProductData;
-
-  // filter the products if a status filter is applied
-  if (filters.statusFilter) {
-    products = MockProductData.filter((product) => {
-      return product.statusId === filters.statusFilter;
-    });
-
-    // set the max number of pages
-    maxPages = Math.ceil(products.length / productsPerPage);
-  } else {
-    // set the max number of pages
-    maxPages = Math.ceil(MockProductData.length / productsPerPage);
+  if (response.status !== 200) {
+    throw new Error("Failed to fetch products");
   }
 
-  // get the products for the current page
-  products = products.slice(startIndex, endIndex);
-
-  // simulate a delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // return the products
-  return Promise.resolve({
-    products: products.map((product) => new ProductEntity(product)),
-    maxPages,
+  return {
+    products: response.data.products.map(
+      (product: object) => new ProductEntity(product)
+    ),
+    maxPages: response.data.pagination.totalPages,
     filters,
-  });
+  };
 }
 
 /**
  * Update a product.
  * @param productId The product ID.
- * @returns The product.
  */
-function updateProduct(product: ProductEntity): Promise<ProductEntity> {
-  product.updatedAt = new Date();
+async function updateProduct(product: ProductEntity, blob: Blob | null = null) {
+  let base64image = null;
+  let imageExtension = null;
 
-  // simulate a delay
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      // resolve the promise with the updated product
-      resolve(product);
-    }, 1000)
-  );
+  // handle image
+  if (blob) {
+    imageExtension = blob.type.split("/")[1];
+    base64image = await blobToBase64(blob);
+    base64image = base64image.split("base64,")[1];
+  }
+
+  const response = await api.put(`/products/${product.id}`, {
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    categoryId: product.categoryId,
+    statusId: product.statusId,
+    imageUrl: product.imageUrl,
+    imageBytes: base64image ? base64image : null,
+    imageExtension: base64image ? imageExtension : null,
+  });
+
+  if (response.status !== 200) {
+    throw new Error("Failed to update product");
+  }
 }
 
 /**
- * Analyze product image.
- * @param image The image to analyze.
- * @returns The predicted product details.
+ * Analyzes a product image and returns the predicted product details.
+ *
+ * @param {File} image - The image file to analyze.
+ * @param {boolean} create - Whether to create the product after analysis.
+ * @return {Promise<ProductEntity>} A promise that resolves to the predicted product.
+ * @throws {Error} If the image analysis fails or the API response is invalid.
  */
-function analyzeProductImage(image: File): Promise<ProductEntity> {
-  return new Promise((resolve) => {
-    // simulate a delay
-    setTimeout(() => {
-      // create a new product entity
-      const product = new ProductEntity({
-        name: "New Product",
-        category: "1",
-        description: "New Product Description",
-        categoryId: 1,
-        price: 0,
-        imageUrl: URL.createObjectURL(image),
-      });
-
-      // resolve the promise with the product
-      resolve(product);
-    }, 1000);
+async function analyzeProductImage(image: File, create: boolean=false): Promise<[ProductEntity, number]> {
+  // convert image to base64
+  const base64image = await image.arrayBuffer().then((buffer) => {
+    return Buffer.from(buffer).toString("base64");
   });
+
+  // call the analyze product image api
+  // and return the predicted product details
+  const results = await api.post("/products/analyze", {
+    imageBytes: base64image,
+    imageExtension: image.name.split(".").pop(),
+    create: create,
+  });
+
+  if (results.status !== 200) {
+    throw new Error("Failed to analyze product image");
+  }
+
+  const data = await results.data;
+
+  if (!data) {
+    throw new Error("Failed to analyze product image");
+  }
+
+  return [new ProductEntity(data.product), data.confidence];
 }
 
 /**
  * Create a new product.
  * @param product The product to create.
- * @returns The created product.
+ * @throws {Error} If the request fails.
  */
-function createProduct(product: ProductEntity): Promise<ProductEntity> {
-  product.id = MockProductData.length + 1;
-  product.createdAt = new Date();
-  product.updatedAt = new Date();
+async function createProduct(product: ProductEntity): Promise<void> {
+  const response = await api.post("/products/add", product.toObject());
 
-  // simulate a delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // resolve the promise with the created product
-      resolve(product);
-    }, 1000);
-  });
+  if (response.status !== 201) {
+    throw new Error("Failed to create product");
+  }
 }
 
 /**
  * Delete a product.
- * @param product The product to delete.
+ * @param productId The id of the product to delete.
  */
-function deleteProduct(): Promise<void> {
+async function deleteProduct(productId: number): Promise<void> {
+  const response = await api.delete(`/products/${productId}`);
+  if (response.status !== 200) {
+    throw new Error("Failed to delete product");
+  }
+
   return Promise.resolve();
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result?.toString() || "");
+    reader.readAsDataURL(blob);
+  });
 }
 
 export {

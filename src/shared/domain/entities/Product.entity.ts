@@ -35,7 +35,7 @@ class ProductEntity {
   createdAt? : Date;
   updatedAt? : Date;
 
-  constructor(private data: ProductData) {
+    constructor(private data: ProductData) {
     this.id = data.id;
     this.name = data.name;
     this.description = data.description;
